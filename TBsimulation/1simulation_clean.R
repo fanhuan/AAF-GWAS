@@ -4,7 +4,7 @@
 #biocLite("Biostrings")
 #setwd("/Users/iveslab/Dropbox/RESEARCH/GWAS/TBsimulation")
 #name this simulation by assigning repn
-repn=070901
+repn=070904
 
 library(phylosim)
 library(ape)
@@ -44,13 +44,7 @@ codon.freqs.S450[4] <- 20 #TTG, twenty times higher, selected
 codon.freqs.S450 <- codon.freqs.S450/sum(codon.freqs.S450)
 p.S450 <- GY94(codon.freqs = codon.freqs.S450, rate.multiplier = 10)
 p.S450$kappa = 2
-'''
-#Plot the transition matrix and equilibrium distribution of the two models
-quartz(1)
-plot(p.flanking, scale = 0.5)
-quartz(2)
-plot(p.S450, scale = 0.5)
-'''
+
 #construct the root sequence
 string="TTGGCAGATTCCCGCCAGAGCAAAACAGCCGCTAGTCCTAGTCCGAGTCGCCCGCAAAGTTCCTCGAATAACTCCGTACCCGGAGCGCCAAACCGGGTCTCCTTCGCTAAGCTGCGCGAACCACTTGAGGTTCCGGGACTCCTTGACGTCCAGACCGATTCGTTCGAGTGGCTGATCGGTTCGCCGCGCTGGCGCGAATCCGCCGCCGAGCGGGGTGATGTCAACCCAGTGGGTGGCCTGGAAGAGGTGCTCTACGAGCTGTCTCCGATCGAGGACTTCTCCGGGTCGATGTCGTTGTCGTTCTCTGACCCTCGTTTCGACGATGTCAAGGCACCCGTCGACGAGTGCAAAGACAAGGACATGACGTACGCGGCTCCACTGTTCGTCACCGCCGAGTTCATCAACAACAACACCGGTGAGATCAAGAGTCAGACGGTGTTCATGGGTGACTTCCCGATGATGACCGAGAAGGGCACGTTCATCATCAACGGGACCGAGCGTGTGGTGGTCAGCCAGCTGGTGCGGTCGCCCGGGGTGTACTTCGACGAGACCATTGACAAGTCCACCGACAAGACGCTGCACAGCGTCAAGGTGATCCCGAGCCGCGGCGCGTGGCTCGAGTTTGACGTCGACAAGCGCGACACCGTCGGCGTGCGCATCGACCGCAAACGCCGGCAACCGGTCACCGTGCTGCTCAAGGCGCTGGGCTGGACCAGCGAGCAGATTGTCGAGCGGTTCGGGTTCTCCGAGATCATGCGATCGACGCTGGAGAAGGACAACACCGTCGGCACCGACGAGGCGCTGTTGGACATCTACCGCAAGCTGCGTCCGGGCGAGCCCCCGACCAAAGAGTCAGCGCAGACGCTGTTGGAAAACTTGTTCTTCAAGGAGAAGCGCTACGACCTGGCCCGCGTCGGTCGCTATAAGGTCAACAAGAAGCTCGGGCTGCATGTCGGCGAGCCCATCACGTCGTCGACGCTGACCGAAGAAGACGTCGTGGCCACCATCGAATATCTGGTCCGCTTGCACGAGGGTCAGACCACGATGACCGTTCCGGGCGGCGTCGAGGTGCCGGTGGAAACCGACGACATCGACCACTTCGGCAACCGCCGCCTGCGTACGGTCGGCGAGCTGATCCAAAACCAGATCCGGGTCGGCATGTCGCGGATGGAGCGGGTGGTCCGGGAGCGGATGACCACCCAGGACGTGGAGGCGATCACACCGCAGACGTTGATCAACATCCGGCCGGTGGTCGCCGCGATCAAGGAGTTCTTCGGCACCAGCCAGCTGAGCCAATTCATGGACCAGAACAACCCGCTGTCGGGGTTGACCCACAAGCGCCGACTGTCGGCGCTGGGGCCCGGCGGTCTGTCACGTGAGCGTGCCGGGCTGGAGGTCCGCGACGTGCACCCGTCGCACTACGGCCGGATGTGCCCGATCGAAACCCCTGAGGGGCCCAACATCGGTCTGATCGGCTCGCTGTCGGTGTACGCGCGGGTCAACCCGTTCGGGTTCATCGAAACGCCGTACCGCAAGGTGGTCGACGGCGTGGTTAGCGACGAGATCGTGTACCTGACCGCCGACGAGGAGGACCGCCACGTGGTGGCACAGGCCAATTCGCCGATCGATGCGGACGGTCGCTTCGTCGAGCCGCGCGTGCTGGTCCGCCGCAAGGCGGGCGAGGTGGAGTACGTGCCCTCGTCTGAGGTGGACTACATGGACGTCTCGCCCCGCCAGATGGTGTCGGTGGCCACCGCGATGATTCCCTTCCTGGAGCACGACGACGCCAACCGTGCCCTCATGGGGGCAAACATGCAGCGCCAGGCGGTGCCGCTGGTCCGTAGCGAGGCCCCGCTGGTGGGCACCGGGATGGAGCTGCGCGCGGCGATCGACGCCGGCGACGTCGTCGTCGCCGAAGAAAGCGGCGTCATCGAGGAGGTGTCGGCCGACTACATCACTGTGATGCACGACAACGGCACCCGGCGTACCTACCGGATGCGCAAGTTTGCCCGGTCCAACCACGGCACTTGCGCCAACCAGTGCCCCATCGTGGACGCGGGCGACCGAGTCGAGGCCGGTCAGGTGATCGCCGACGGTCCCTGTACTGACGACGGCGAGATGGCGCTGGGCAAGAACCTGCTGGTGGCCATCATGCCGTGGGAGGGCCACAACTACGAGGACGCGATCATCCTGTCCAACCGCCTGGTCGAAGAGGACGTGCTCACCTCGATCCACATCGAGGAGCATGAGATCGATGCTCGCGACACCAAGCTGGGTGCGGAGGAGATCACCCGCGACATCCCGAACATCTCCGACGAGGTGCTCGCCGACCTGGATGAGCGGGGCATCGTGCGCATCGGTGCCGAGGTTCGCGACGGGGACATCCTGGTCGGCAAGGTCACCCCGAAGGGTGAGACCGAGCTGACGCCGGAGGAGCGGCTGCTGCGTGCCATCTTCGGTGAGAAGGCCCGCGAGGTGCGCGACACTTCGCTGAAGGTGCCGCACGGCGAATCCGGCAAGGTGATCGGCATTCGGGTGTTTTCCCGCGAGGACGAGGACGAGTTGCCGGCCGGTGTCAACGAGCTGGTGCGTGTGTATGTGGCTCAGAAACGCAAGATCTCCGACGGTGACAAGCTGGCCGGCCGGCACGGCAACAAGGGCGTGATCGGCAAGATCCTGCCGGTTGAGGACATGCCGTTCCTTGCCGACGGCACCCCGGTGGACATTATTTTGAACACCCACGGCGTGCCGCGACGGATGAACATCGGCCAGATTTTGGAGACCCACCTGGGTTGGTGTGCCCACAGCGGCTGGAAGGTCGACGCCGCCAAGGGGGTTCCGGACTGGGCCGCCAGGCTGCCCGACGAACTGCTCGAGGCGCAGCCGAACGCCATTGTGTCGACGCCGGTGTTCGACGGCGCCCAGGAGGCCGAGCTGCAGGGCCTGTTGTCGTGCACGCTGCCCAACCGCGACGGTGACGTGCTGGTCGACGCCGACGGCAAGGCCATGCTCTTCGACGGGCGCAGCGGCGAGCCGTTCCCGTACCCGGTCACGGTTGGCTACATGTACATCATGAAGCTGCACCACCTGGTGGACGACAAGATCCACGCCCGCTCCACCGGGCCGTACTCGATGATCACCCAGCAGCCGCTGGGCGGTAAGGCGCAGTTCGGTGGCCAGCGGTTCGGGGAGATGGAGTGCTGGGCCATGCAGGCCTACGGTGCTGCCTACACCCTGCAGGAGCTGTTGACCATCAAGTCCGATGACACCGTCGGCCGCGTCAAGGTGTACGAGGCGATCGTCAAGGGTGAGAACATCCCGGAGCCGGGCATCCCCGAGTCGTTCAAGGTGCTGCTCAAAGAACTGCAGTCGCTGTGCCTCAACGTCGAGGTGCTATCGAGTGACGGTGCGGCGATCGAACTGCGCGAAGGTGAGGACGAGGACCTGGAGCGGGCCGCGGCCAACCTGGGAATCAATCTGTCCCGCAACGAATCCGCAAGTGTCGAGGATCTTGCG"
 rpoB <- CodonSequence(string=string)
@@ -108,8 +102,8 @@ index <- (1:1172)[alignment.names == 450 & !is.na(alignment.names)]
 w <- data.frame(tip = phy$tip.label, codon = NA, serine = T)
 selected.codons <- sim$alignment[,index]
 for (kk in phy$tip.label) {
-    w$codon[w$tip == kk] <- selected.codons[names(selected.codons) == kk]
-    w$serine[w$tip == kk] <- is.element(selected.codons[names(selected.codons) == kk], serine.codons)
+  w$codon[w$tip == kk] <- selected.codons[names(selected.codons) == kk]
+  w$serine[w$tip == kk] <- is.element(selected.codons[names(selected.codons) == kk], serine.codons)
 }
 
 write.csv(w, file = paste("rpoB_GY84_trait_", repn, ".csv", sep = ""))
@@ -119,29 +113,12 @@ write.csv(w, file = paste("rpoB_GY84_trait_", repn, ".csv", sep = ""))
 #at least 3 serines and 3 non-serines are saved.
 
 if((sum(w$serine) >= 3) & (sum(w$serine) <= length(w$serine)-3)){
-    saveAlignment(sim, file = paste("rpoB_GY84_", repn, ".fas", sep = ""), skip.internal = T) 
-        
-        #        row.names(w) <- w$tip
-        #        z <- binaryPGLMM(serine ~ 1, data=w, phy)
-        #        s2 <- z$s2
-        #        P.H0.s2 <- z$P.H0.s2
-        #        show(c(i, s2, P.H0.s2))
-        
-        #        include <- TRUE
-        #    } else {
-        #        show("too little variation")
-        #        include <- FALSE
-    }
-    #    return(include)
-#}
-'''
-#Run replicates singly
-i <- 1
-while(i <= 100) {
-    include <- sim.replicate(i)
-    if(include == TRUE) i <- i+1
+  saveAlignment(sim, file = paste("rpoB_GY84_", repn, ".fas", sep = ""), skip.internal = T) 
+} else {
+  print("This simulation ended up with two many or too few seriens, abort")
+  stop()
 }
-'''
+
 #Run aaf_phylosim.py and kmer_pattern.py
 #TBSimulation Huan$ aaf_phylosim.py -k 9 -o phylokmer.dat -i rpoB_GY84_102.fas -W
 k<-9
@@ -176,7 +153,7 @@ kmer_df<-unique(kmer_df)
 rc<-NULL
 for (i in 1:nrow(kmer_df)) {
   kmer_df<-rbind(kmer_df,data.frame(kmer=as.character(reverseComplement(DNAString(kmer_df$kmer[i]))), 
-                           position=8-kmer_df$position[i]))
+                                    position=8-kmer_df$position[i]))
 }
 kmer_df<-unique(kmer_df)
 kmer_list_rc<-kmer_df$kmer
@@ -211,27 +188,27 @@ score<-array(0, c(nrow(Y), 1))
 pattern<-array(NA,c(nrow(Y),1))
 output<-data.frame(pattern,score)
 for (i in 1:nrow(Y)) {
-    y<-Y[i,]
-    output$pattern[i]<-paste(y,collapse='')
-    sumy <- sum(y)#sum of the pattern
-    if (sumy < threshold | sumy > (p - threshold)) {
-        output$score[i] <- 0 #all patterns with only 1 one or zero are assigned score 0.
-    } else {
-        xx <- cbind(ones, X)
-        
-        XiCX <- t(xx) %*% iC %*% xx
-        XiCY <- t(xx) %*% iC %*% t(y)
-        
-        b <- solve(XiCX, XiCY)
-        
-        h <- t(y) - (xx %*% b)
-        
-        MSE <- t(h) %*% iC %*% h/(p - 2)
-        
-        iXiCX <- solve(XiCX)
-        bSE <- (MSE * iXiCX[2, 2])^0.5
-        output$score[i] <- b[2]/bSE
-    }
+  y<-Y[i,]
+  output$pattern[i]<-paste(y,collapse='')
+  sumy <- sum(y)#sum of the pattern
+  if (sumy < threshold | sumy > (p - threshold)) {
+    output$score[i] <- 0 #all patterns with only 1 one or zero are assigned score 0.
+  } else {
+    xx <- cbind(ones, X)
+    
+    XiCX <- t(xx) %*% iC %*% xx
+    XiCY <- t(xx) %*% iC %*% t(y)
+    
+    b <- solve(XiCX, XiCY)
+    
+    h <- t(y) - (xx %*% b)
+    
+    MSE <- t(h) %*% iC %*% h/(p - 2)
+    
+    iXiCX <- solve(XiCX)
+    bSE <- (MSE * iXiCX[2, 2])^0.5
+    output$score[i] <- b[2]/bSE
+  }
 }
 output<-output[order(output$score),]
 write.csv(output,paste("rpoB_GY84_", as.character(repn), "_scores.csv", sep=""),row.names = FALSE, )
@@ -240,13 +217,13 @@ write.csv(output,paste("rpoB_GY84_", as.character(repn), "_scores.csv", sep=""),
 kft<-1 #kmer frequency threshold
 pattern450<-array(0,nrow(S450_kmers))
 for (i in 1:nrow(S450_kmers)){
-    pattern450_j<-array(1,ncol(S450_kmers)-1)
-    for (j in 2:ncol(S450_kmers)){
-        if (S450_kmers[i,][j]<kft){
-            pattern450_j[j-1]<-0
-        }
+  pattern450_j<-array(1,ncol(S450_kmers)-1)
+  for (j in 2:ncol(S450_kmers)){
+    if (S450_kmers[i,][j]<kft){
+      pattern450_j[j-1]<-0
     }
-    pattern450[i]<-paste(pattern450_j,collapse='' )
+  }
+  pattern450[i]<-paste(pattern450_j,collapse='' )
 }
 S450_kmers$pattern<-pattern450
 S450_kmers_score<-merge(S450_kmers,output,by="pattern",all.x=T)
@@ -256,17 +233,3 @@ output_450<-merge(S450_kmers_score, kmer_df, by="kmer",all.x=T)
 output_450_light<-subset(output_450,select=c("kmer","position","pattern","score"))
 output_450<-output[output$pattern %in% pattern450,]
 write.csv(output_450_light,paste("rpoB_GY84_", as.character(repn), "_450summary.csv", sep=""),row.names = FALSE, )
-
-'''
-filter_kmer_from_pattern.sh<-NULL
-for (i in 1:nrow(output_450)) {
-    filter_kmer_from_pattern.sh<-c(filter_kmer_from_pattern.sh,paste("python /usr/bin/filter_kmer_from_pattern.py ",
-                                                                     output_450$pattern[i], " TB_pkdat_list.txt -d rpoB_GY84_", 
-                                                                     as.character(repn), sep = ""))    
-}
-system("rm filter_kmer_from_pattern.sh")
-write.table(filter_kmer_from_pattern.sh,'filter_kmer_from_pattern.sh',row.names=FALSE,
-            col.names=FALSE,quote=FALSE)
-#sys2
-system("sh filter_kmer_from_pattern.sh")
-'''
