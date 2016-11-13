@@ -1,4 +1,10 @@
-# source("http://bioconductor.org/biocLite.R")
+# This script calculates association scores for the Cohen dataset
+##############################################
+
+
+##############################################
+# Load packages
+##############################################
 # source("https://bioconductor.org/biocLite.R")
 # biocLite("Biostrings")
 # install.packages(c("R.oo","compoisson","R.methodsS3"))
@@ -17,6 +23,9 @@ library(ggplot2)
 source("~/Dropbox/Research/GWAS/phyloglm_aaf.R")
 source("~/Dropbox/Research/GWAS/phyloglm_ML.R")
 
+##############################################
+# Self-defined packages
+##############################################
 #rank_fh is a function that takes a dataframe and add a rank column according to one column (given the column number)
 #such that the numbers above 0 are ranked from high to low as 1,2,3,4 while numbers below 0 are ranked from
 #low to high as -1, -2, -3, -4. 0 is ranked as 0.
@@ -50,16 +59,75 @@ rank_fh <- function(serial) {
 	return(df$ranking)
 }
 
+LS <- function(xx,y){
+	XX <- t(xx) %*% xx
+	XY <- t(xx) %*% y
+	b <- solve(XX, XY)
+	h <- y - (xx %*% b)
+	MSE <- t(h) %*% h/(p - 2)
+	iXX <- solve(XX)
+	bSE <- (MSE * iXX[2, 2])^0.5
+	scoreLS <- b[2]/bSE
+	return(scoreLS)
+}
+
+Logistf <- function(X,y){
+	fit_Log <- logistf(y ~ X)
+	scoreLog <- sign(fit_Log$coef[2]) * qchisq(fit_Log$prob[2], df=1, lower.tail=F)
+	return(scoreLog)
+}
+
+GLS <- function(xx,y,iC){
+	XiCX <- t(xx) %*% iC %*% xx
+	XiCY <- t(xx) %*% iC %*% y
+	b <- solve(XiCX, XiCY)
+	h <- y - (xx %*% b)
+	MSE <- t(h) %*% iC %*% h/(p - 2)
+	iXiCX <- solve(XiCX)
+	bSE <- (MSE * iXiCX[2, 2])^0.5
+	scoreGLS <- b[2]/bSE
+	return(scoreGLS)
+}
+
+PLog <- function(X,y,phy.extend){
+	fit <- phyloglm_aaf(y ~ X, phy=phy.extend, Firth=F)
+	scorePLog <- fit$zB[2]
+	return(scorePLog)
+}
+
+PLogF <- function(X,y,phy.extend){
+	fit_F <- phyloglm_aaf(y ~ X, phy=phy.extend, Firth=T)
+	scorePLogF <- fit_F$zB[2]
+	return(scorePLogF)
+}
+
+PLogML <- function(X,y,phy.extend){
+	fit_ML <- try(phyloglm_ML(y ~ X, phy=phy.extend), silent=T)
+	fit_ML0 <- try(phyloglm_ML(y ~ 1, phy=phy.extend), silent=T)
+	if(is.null(attr(fit_ML,'condition')) & is.null(attr(fit_ML0,'condition'))){
+		scorePLogML <- sign(fit_ML$coef[2]) * 2*(fit_ML$logLik - fit_ML0$logLik)
+	}else{
+		scorePLogML <- NA
+	}
+	return(scorePLogML)
+}
+
+addscore <- function(x) {
+	return(paste0('score',x))
+}
 
 #Parameters
 k <- 17
+#Models available
+model_list <- c('LS','Logistf','GLS','PLog','PLogF','PLogML')
+
 
 ##############################################
 # Input tree
 ##############################################
 
 
-phy <- read.tree(file = "Cohen/TBcohen_k",k,"_n1_whole_sorted.tre")
+phy <- read.tree(file = paste0("Cohen/TBcohen_k",k,"_n1_whole_sorted.tre"))
 #Test whether there is zero length branches. If yes, collapse them.
 if (min(phy$edge.length) == 0) {
   threshold <- min(phy$edge.length[which(phy$edge.length>0)])
@@ -105,7 +173,7 @@ w <- merge(w_gen,w_cul,by=c('SpecimenID'),sort = F)
 #sort the dataframe by tip name, and turn R/S into 1/0
 trait_gen <- w$Genotype
 trait_gen <- ifelse(trait_gen == 'R',1,0)
-names(trait_gen) <- sort(phy$tip.label)
+names(trait_gen) <- sort(phy.extend$tip.label)
 trait_cul <-w$R
 trait_cul <- ifelse(trait_cul == 'R',1,0)
 names(trait_cul) <- sort(phy$tip.label)
@@ -116,12 +184,7 @@ names(trait_cul) <- sort(phy$tip.label)
 #y(rhs) should be kmer pattern #How did I get the kmer patterns
 #read in the kmer pattern as Y, and calculate score for each y.
 Y <- read.fwf(file = paste0("Cohen/TBcohen_k",k,"_n1_p1_kmerPattern.stats"), widths = array(1, c(1, p)), header = F)
-colnames(Y) <- sort(phy$tip.label)
-
-
-
-
-
+colnames(Y) <- sort(phy.extend$tip.label)
 
 ##############################################
 # score based on genetically imputed phenotype
@@ -130,8 +193,10 @@ xx <- cbind(ones, X)
 threshold <- 3
 
 pattern <- array(NA, c(nrow(Y), 1))
-output_gen <- data.frame(pattern, sumy=0, scoreLS=0, scoreGLS=0, scorePhyloGLM=0)
-
+output_gen = data.frame(matrix(vector(),nrow(Y),2+length(model_list)))
+asd<-sapply(model_list,addscore,USE.NAMES = F)
+names(output_gen) = c('pattern','sumy',asd)
+output_gen$pattern<-pattern
 
 for (i in 1:nrow(Y)) {
   y <- t(Y[i, ])
@@ -142,84 +207,35 @@ for (i in 1:nrow(Y)) {
     
     ##################
     # LS
+	
+    output_gen$scoreLS[i] <- LS(xx,y)
+	
+    ###################
+    # Logistf
 
-    XX <- t(xx) %*% xx
-    XY <- t(xx) %*% y
-    b <- solve(XX, XY)
-    h <- y - (xx %*% b)
-    MSE <- t(h) %*% h/(p - 2)
-    iXX <- solve(XX)
-    bSE <- (MSE * iXX[2, 2])^0.5
-    output_gen$scoreLS[i] <- b[2]/bSE
-  
-    #
-    # ##################
-    # # GLS:with phylogenetic signal
-    #
-    XiCX <- t(xx) %*% iC %*% xx
-    XiCY <- t(xx) %*% iC %*% y
-    b <- solve(XiCX, XiCY)
-    h <- y - (xx %*% b)
-    MSE <- t(h) %*% iC %*% h/(p - 2)
-    iXiCX <- solve(XiCX)
-    bSE <- (MSE * iXiCX[2, 2])^0.5
-    output_gen$scoreGLS[i] <- b[2]/bSE
-    
-    #
+    output_gen$scoreLogistf[i] <- Logistf(X,y)
+	
     #################
-    # PhyloGLM
-    fit <- phyloglm_aaf(y ~ X, phy=phy)
-    output_gen$scorePhyloGLM[i] <- fit$zB[2]
-    show(i)
-    #show(c(i, zB2.LS, zB2.GLS, fit$zB[2]))
-    # GLM
-
-    # mu = mean(y)
-    # B.init = matrix(c(log(mu/(1-mu)),0.0001), ncol=1)
-    # show(c(i, 1, sumy, system.time(z.GLM <- binaryPGLM(y ~ X, phy = phy, s2 = 1, B.init = B.init))))
-    # if(z.GLM$convergeflag == "converged") {
-    #   output$scoreGLM[i] <- z.GLM$B[2]/z.GLM$B.se[2]
-    # } else {
-    #   show('not converged')
-    # }
-    ##################
-    # GLMM
-    
-    # show(c(i, 1, sumy, system.time(z.GLMM <- binaryPGLMM(y ~ X, phy=phy, s2.init = 0.001))))
-    # if(z.GLMM$convergeflag == "converged") {
-    # output$scoreGLM[i] <- z.GLMM$B[2]/z.GLMM$B.se[2]
-    # } else {
-    # show('not converged')
-    # }
-    ##################
-    # Log
-    
-    #show(c(i, 2, sumy, system.time(z.Log <- phyloglm(y ~ X, phy=phy))))
-    #output$scoreLog[i] <- z.Log$coefficients[2]/z.Log$sd[2]
-    # z.Log <- phyloglm(y ~ X, phy=phy, method = "logistic_IG10")
-    # if (z.Log$convergence == 0) {
-    #   count_phyloglm = count_phyloglm + 1
-    #   output_gen$scoreLog[i] <- output_gen$scorephyloglm[i] <- z.Log$coefficients[2]/z.Log$sd[2]
-    #   }
-    # else { 
-    #   l.Log <- logistf(y ~ X)
-    #   output_gen$scoreLog[i] <- output_gen$scorelogistf[i] <- l.Log$coefficients[2]/sqrt(l.Log$var[2,2])
-    # }
-    # show(c(count, z.Log$convergence))
-    # count = count + 1
-  }
+    # GLS
+	
+    output_gen$scoreGLS[i] <- GLS(xx,y,iC)
+	
+	##################
+    # PLog
+	
+	output_gen$scorePLog[i] <- PLog(X,y,phy.extend)
+	##################
+    # PLogF
+	
+	output_gen$scorePLogF[i] <- PLogF(X,y,phy.extend)
+	##################
+	# PLogML
+	
+	output_gen$scorePLogML[i] <- PLogML(X,y,phy.extend)
+	
+	}
 }
 
-#Check for NaNs
-# c(min(output_gen$scoreLS),min(output_gen$scoreGLS),min(output_gen$scorePhyloGLM))
-# c(max(output_gen$scoreLS),max(output_gen$scoreGLS),max(output_gen$scorePhyloGLM))
-# #Count the number of NaNs.
-# sum(is.na(output_gen$scorePhyloGLM))
-# #If no NA
-# ranked.LS.gen <- rank_fh(output_gen, 3)[,c(1,3,6)]
-# ranked.GLS.gen <- rank_fh(output_gen, 4)[,c(1,4,6)]
-# ranked.PhyloGLM.gen <- rank_fh(output_gen, 5)[,c(1,4,6)]
-#If there are NAs.
 complete.output.gen <- output_gen[is.na(output_gen)] <- 0
 ranked.LS.gen <- rank_fh(complete.output.gen, 3)[,c(1,3,6)]
 ranked.GLS.gen <- rank_fh(complete.output.gen, 4)[,c(1,4,6)]

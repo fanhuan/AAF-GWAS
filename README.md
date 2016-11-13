@@ -1,4 +1,4 @@
-# AAF-GWAS
+# ASuK
 =======
 
-Making associations between phenotype and genotypes using k-mers.
+Associations studies using k-mers.
