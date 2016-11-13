@@ -292,9 +292,9 @@ output_cul$rankGLS <- rank_fh(output_cul$scoreGLS)
 output_cul$rankPLog <- rank_fh(output_cul$scorePLog)
 output_cul$rankPLogF <- rank_fh(output_cul$scorePLogF)
 output_cul$rankPLogML <- rank_fh(output_cul$scorePLogML)
-output_cul <- output_cul %>% select(-id)
+#output_cul <- output_cul %>% dplyr::select(-id)
 #Save the scores
-write.csv(output_cul, paste0("TBcohen_k",k,"_n1_p1_scores_cul.csv"), row.names = FALSE)
+write.csv(output_cul, paste0("TBcohen_k",k,"_n1_p2_scores_cul.csv"), row.names = FALSE)
 
 #Save patterns with top 10 rank (both positive and negative)
 TBcohen_n1_p1_scores_gen <- read.csv(paste0("~/Dropbox/Research/GWAS/TBcohen_k",k,"_n1_p1_scores_gen.csv"),colClasses=c("character",rep("numeric",5)))
