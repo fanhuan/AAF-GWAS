@@ -1,6 +1,7 @@
-# ASuK
+# AAF-GWAS
 =======
 
-Associations studies using k-mers.
+AAF-GWAS tries to find k-mers that are associated with certain trait in a population, or even across different species. 
 
-Do you like this name? Or shall we stick to AAF-GWAS?
+This project is still in working progress. Everything is still in R but will be packaged in python eventually.
+
