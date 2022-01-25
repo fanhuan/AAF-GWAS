@@ -7,7 +7,8 @@ library(hash)
 output.scores <- read_csv("rpoBsimulation/sp100d01/S450_summary/rpoBsimulation_output_scores_1Dec21.csv")
 # Rename the models
 old_model <- c('LS','LogF','GLS','EGLS','PLog','phyloglmA','PhyLog',
-               'PLogML','PLogML_LR','PLogML_LR_p','PLogML_LR_a')
+               'PLog
+               L','PLogML_LR','PLogML_LR_p','PLogML_LR_a')
 new_model <- c('LS','LogF','GLS','EGLS','Phylog','PhylogF','PhylogF_EstA',
                'PhylogML','PhylogML_LR','PhylogML_LR_p','PhylogML_EstA')
 h <- hash(new_model,old_model)
